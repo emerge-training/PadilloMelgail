@@ -1,43 +1,75 @@
 import jk.widget.common
-import jk.gfx.Color
+import jk.widget.datagrid
 
-class is TitledWidget #widget:
+class #widget:
 
-ui LayerWidget
+ui VerticalBoxWidget
 {
-    VerticalScrollerWidget {
-        scrollBarDisabled = true
-        LayerWithBackgroundColorWidget container {
-            color = Color.yellow()
-            VerticalBoxWidget list {
-                margin = context.getHeightValue("5mm")
-                spacing = context.getHeightValue("5mm")
+    spacing = context.getHeightValue("2000um")
+    margin = context.getHeightValue("5mm")
+    HorizontalBoxWidget {
+        spacing = context.getHeightValue("100um")
+        TextButtonWidget btnAdd : 1.0 {
+            text = "ADD TASK"
+            padding = context.getHeightValue("1000um")
+            backgroundColor = Color.instance("#D91E18")
+            clickHandler = func {
+                onViewClicked()
             }
+        
         }
+    }
+    VerticalScrollerWidget {
+		scrollBarDisabled = false
+		LayerWithBackgroundColorWidget container {
+            color = Color.instance("#5d89e8")
+		AlignWidget {
+			VerticalBoxWidget vbox : 0.5, 0.5, false {
+				margin = context.getHeightValue("5mm")
+				spacing = context.getHeightValue("2000um") 
+                LabelWidget {
+					text = "TASK LIST"
+					textColor = Color.black()
+					fontSize = context.getHeightValue("5mm")
+					textAlign = LabelWidget.ALIGN_CENTER
+					fontBold = true
+				}  
+            } 
+        }
+        DataGridWidget grid{
+                    cellPadding = 1
+        }
+    }
     }
 }
 
 func initializeWidget override
 {
     base.initializeWidget()
-    APIClient.getInstance().getTasks(func(response as DynamicMap) {
+    grid.addColumn("ID", "id", 0.5)
+	grid.addColumn("Name", "name", 1.0)
+	grid.addColumn("Description", "description", 1.0)
+    grid.addColumn("Time Added", "timeStampAdded", 1.0)
+    grid.addColumn("Time Updated", "timeStampLastUpdated", 1.0)
+
+	grid.addWidgetHeaderRow()
+    APIClient.getInstance().getTasks(func(response as DynamicMap){
         var data = assert response.getDynamicMap("data")
         var records = data.getDynamicVector("records")
-        if not records || records.getSize() < 1 {
-            list.addWidget(AlignWidget.forWidget(context, LabelWidget.forText(context, "No record")), 1.0)
+        if not records || records.getSize() < 1{
+            grid.addRow([ "No Task!" ])
         }
         else {
             foreach record as DynamicMap in records.toVector() {
-                var task = record.getString("name") .. " - " .. record.getString("description")
-                var lblTask = LabelWidget.forText(context, task)
-                var hbox = HorizontalBoxWidget.forContext(context, 0, context.getHeightValue("0.5mm"))
-                hbox.addWidget(lblTask)
-                list.addWidget(AlignWidget.forWidget(context, hbox), 1.0)
+                
+                grid.addRow([ record.getString("id"), record.getString("name"), record.getString("description"), record.getString("timeStampAdded"), record.getString("timeStampLastUpdated") ])
             }
         }
+    },func(err as Error){
+        grid.addRow([ "Error" ])
     })
 }
 
-func getWidgetTitle as string:
-    return "Task list"
-    
+func onViewClicked:
+    NavigationWidget.switchToContainer(this, new AddTask(context))
+

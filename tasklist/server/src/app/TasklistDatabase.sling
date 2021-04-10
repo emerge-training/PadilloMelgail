@@ -16,7 +16,7 @@ model Task
     timeStampLastUpdated as long
 }
 
-const TASK = "task"
+const TASK = "Task"
 pvar db as MySQLDatabase
 
 func forContext(ctx as LoggingContext) static as this
@@ -44,7 +44,7 @@ func updateTable(table as SQLTableInfo)
 func updateTables
 {
     var task = SQLTableInfo.forName(TASK)
-    task.addStringKeyColumn("id")
+    task.addIntegerKeyColumn("id")
     task.addStringColumn("name")
     task.addStringColumn("description")
     task.addLongColumn("timeStampAdded")
@@ -55,7 +55,6 @@ func updateTables
 func addTask(task as Task) as Task
 {
     assert task
-    task.setId("1")
     task.setTimeStampAddedValue(SystemClock.asUTCSeconds())
     assert db.executeSync(db.prepareInsertStatementSync(TASK, task.toDynamicMap()))
     return task
@@ -66,14 +65,12 @@ func updateTask(id as string, task as Task) as bool
     assert task
     task.setTimeStampLastUpdatedValue(SystemClock.asUTCSeconds())
     var criteria = new Task()
-    criteria.setId(id)
     return db.executeSync(db.prepareUpdateStatementSync(TASK, criteria.toDynamicMap(), task.toDynamicMap()))
 }
 
 func deleteTask(id as string) as bool
 {
     var criteria = new Task()
-    criteria.setId(id)
     return db.executeSync(db.prepareDeleteStatementSync(TASK, criteria.toDynamicMap()))
 }
 

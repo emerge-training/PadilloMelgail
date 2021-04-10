@@ -1,0 +1,83 @@
+
+import jk.widget
+import jk.widget.common
+
+class #widget:
+
+model Task
+{
+	name as string
+    description as string
+}
+
+ui VerticalBoxWidget
+{
+	spacing = context.getHeightValue("2000um")
+    margin = context.getHeightValue("5mm")
+    HorizontalBoxWidget {
+        spacing = context.getHeightValue("100um")
+        TextButtonWidget btnHome : 1.0 {
+            text = "VIEW TASK"
+            padding = context.getHeightValue("1000um")
+            backgroundColor = Color.instance("#D91E18")
+            clickHandler = func {
+                onViewClicked()
+            }
+        }
+		
+    }
+	VerticalScrollerWidget {
+		scrollBarDisabled = true
+		LayerWithBackgroundColorWidget container {
+            color = Color.instance("#5d89e8")
+		AlignWidget {
+			VerticalBoxWidget vbox : 0.5, 0.5, false {
+				margin = context.getHeightValue("5mm")
+				spacing = context.getHeightValue("2000um")
+				LabelWidget {
+					text = "ADD TASK"
+					textColor = Color.black()
+					fontSize = context.getHeightValue("4mm")
+					textAlign = LabelWidget.ALIGN_CENTER
+					fontBold = true
+				}
+				TextInputWidget name {
+					type = TextInputWidget.TYPE_NAME
+					placeholder = "NAME"
+					backgroundColor = Color.white()
+					fontSize = context.getHeightValue("2mm")
+					padding = context.getHeightValue("2500um")
+				}
+				TextInputWidget description {
+					type = TextInputWidget.TYPE_NAME
+					placeholder = "DESCRIPTION"
+					backgroundColor = Color.white()
+					fontSize = context.getHeightValue("2mm")
+					padding = context.getHeightValue("2500um")
+				}
+			}
+		}
+		}
+	}
+}
+func onViewClicked:
+	NavigationWidget.switchToContainer(this, new Tasklist(context))
+
+func initializeWidget override
+{
+	base.initializeWidget()
+	var savebtn = ButtonWidget.forText(context, "SAVE", func {
+		var t = new Task()
+		t.setName(name.getWidgetText())
+		t.setDescription(description.getWidgetText())
+		APIClient.getInstance().addTask(t.toDynamicMap(), func(response as DynamicMap) {
+			context.showMessageDialog("Notice","Task Saved!")
+			name.setWidgetText("")
+			description.setWidgetText("")
+	},  func (error as Error){
+			context.showMessageDialog("Notice","Failed to Save Task!")
+		})
+})
+	savebtn.setWidgetFontSize(context.getHeightValue("4mm"))
+	vbox.addWidget(savebtn)
+}
