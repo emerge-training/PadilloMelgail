@@ -5,7 +5,7 @@ class is HTTPRPCRouter #webapi2:
 
 model NoteRequest
 {
-    name as string
+    title as string
     description as string
 }
 
@@ -24,10 +24,10 @@ func getDatabase as NoteListDatabase
 func postProcess(req as HTTPWorkerRequest, resp as HTTPWorkerResponse) override:
     cors.handleWorkerRequest(req, resp)
 
-GET "/notes"
+GET "/note"
 {
-    var notes = assert getDatabase().getNotes()
-    sendOk notes
+    var note = assert getDatabase().getNotes()
+    sendOk note
 }
 
 POST "/note"
@@ -35,7 +35,7 @@ POST "/note"
     var requestData = assert NoteRequest.forJsonString(req.getBodyString()):
         sendError "invalidRequest"
     var note = new NoteListDatabase.Note()
-    note.setName(requestData.getName())
+    note.setTitle(requestData.getTitle())
     note.setDescription(requestData.getDescription())
     assert getDatabase().addNote(note):
         sendError "failedToSaveNote"
@@ -47,7 +47,7 @@ PUT "/note/:id"
     var requestData = assert NoteRequest.forJsonString(req.getBodyString()):
         sendError "invalidRequest"
     var note = new NoteListDatabase.Note()
-    note.setName(requestData.getName())
+    note.setTitle(requestData.getTitle())
     note.setDescription(requestData.getDescription())
     assert getDatabase().updateNote(vars.getString("id"), note):
         sendError "failedToUpdateNote"
