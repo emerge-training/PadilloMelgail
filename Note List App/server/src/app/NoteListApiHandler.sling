@@ -3,7 +3,7 @@ import jk.http.worker
 
 class is HTTPRPCRouter #webapi2:
 
-model NoteRequest
+model Note
 {
     title as string
     description as string
@@ -26,13 +26,13 @@ func postProcess(req as HTTPWorkerRequest, resp as HTTPWorkerResponse) override:
 
 GET "/note"
 {
-    var note = assert getDatabase().getNotes()
+    var note = assert getDatabase().getNote()
     sendOk note
 }
 
 POST "/note"
 {
-    var requestData = assert NoteRequest.forJsonString(req.getBodyString()):
+    var requestData = assert Note.forJsonString(req.getBodyString()):
         sendError "invalidRequest"
     var note = new NoteListDatabase.Note()
     note.setTitle(requestData.getTitle())
@@ -44,7 +44,7 @@ POST "/note"
 
 PUT "/note/:id"
 {
-    var requestData = assert NoteRequest.forJsonString(req.getBodyString()):
+    var requestData = assert Note.forJsonString(req.getBodyString()):
         sendError "invalidRequest"
     var note = new NoteListDatabase.Note()
     note.setTitle(requestData.getTitle())

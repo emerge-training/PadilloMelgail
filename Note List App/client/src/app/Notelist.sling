@@ -7,6 +7,13 @@ ui VerticalBoxWidget
 {
     spacing = context.getHeightValue("2000um")
     margin = context.getHeightValue("5mm")
+    LabelWidget {
+		text = "NOTE LIST APPLICATION"
+		textColor = Color.black()
+		fontSize = context.getHeightValue("5mm")
+		textAlign = LabelWidget.ALIGN_CENTER
+		fontBold = true
+				} 
     HorizontalBoxWidget {
         spacing = context.getHeightValue("100um")
         TextButtonWidget btnAdd : 1.0 {
@@ -14,26 +21,38 @@ ui VerticalBoxWidget
             padding = context.getHeightValue("1000um")
             backgroundColor = Color.instance("#D91E18")
             clickHandler = func {
-                onViewClicked()
+                onAddClicked()
+            }
+        
+        }
+        TextButtonWidget btnUpdate : 1.0 {
+            text = "UPDATE NOTE"
+            padding = context.getHeightValue("1000um")
+            backgroundColor = Color.instance("#D91E18")
+            clickHandler = func {
+                onUpdateClicked()
+            }
+        
+        }
+        TextButtonWidget btnDelete : 1.0 {
+            text = "DELETE NOTE"
+            padding = context.getHeightValue("1000um")
+            backgroundColor = Color.instance("#D91E18")
+            clickHandler = func {
+                onDeleteClicked()
             }
         
         }
     }
     VerticalScrollerWidget {
-		scrollBarDisabled = false
+		scrollBarDisabled = true
 		LayerWithBackgroundColorWidget container {
             color = Color.instance("#5d89e8")
 		AlignWidget {
 			VerticalBoxWidget vbox : 0.5, 0.5, false {
-				margin = context.getHeightValue("5mm")
+				margin = context.getHeightValue("40mm")
 				spacing = context.getHeightValue("2000um") 
-                LabelWidget {
-					text = "NOTE LIST APPLICATION"
-					textColor = Color.black()
-					fontSize = context.getHeightValue("5mm")
-					textAlign = LabelWidget.ALIGN_CENTER
-					fontBold = true
-				}  
+                
             } 
         }
         DataGridWidget grid{
@@ -70,6 +89,11 @@ func initializeWidget override
     })
 }
 
-func onViewClicked:
+func onAddClicked:
     NavigationWidget.switchToContainer(this, new AddNote(context))
 
+func onUpdateClicked:
+    NavigationWidget.switchToContainer(this, new UpdateNote(context))
+
+func onDeleteClicked:
+    NavigationWidget.switchToContainer(this, new DeleteNote(context))

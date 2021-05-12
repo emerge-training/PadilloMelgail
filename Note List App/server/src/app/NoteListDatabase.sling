@@ -44,7 +44,7 @@ func updateTable(table as SQLTableInfo)
 func updateTables
 {
     var note = SQLTableInfo.forName(NOTE)
-    note.addStringKeyColumn("id")
+    note.addIntegerKeyColumn("id")
     note.addStringColumn("title")
     note.addStringColumn("description")
     note.addLongColumn("timeStampAdded")
@@ -65,12 +65,14 @@ func updateNote(id as string, note as Note) as bool
     assert note
     note.setTimeStampLastUpdatedValue(SystemClock.asUTCSeconds())
     var criteria = new Note()
+    criteria.setId(id)
     return db.executeSync(db.prepareUpdateStatementSync(NOTE, criteria.toDynamicMap(), note.toDynamicMap()))
 }
 
 func deleteNote(id as string) as bool
 {
     var criteria = new Note()
+    criteria.setId(id)
     return db.executeSync(db.prepareDeleteStatementSync(NOTE, criteria.toDynamicMap()))
 }
 
